@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ротация</title>
+<meta name="description" content="Дайджест внутренней мобильности: новые механики переходов между командами и главные новости.">
+<meta property="og:title" content="Ротация">
+<meta property="og:description" content="Новые механики внутренних переходов и главные новости.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0F0F0E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230F0F0E'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23CFA75A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: одна узкая колонка для чтения. Шапка → «Коротко» → вкладки «Фишки / Новости» → строки-аккордеоны. Детали скрыты, пока их не открыли. Single dark look by design. */
+:root{
+  --bg:#0F0F0E; --surface:#171715; --surface-2:#1E1E1C; --ink:#ECEAE4; --soft:#B4B1A9; --muted:#7F7C75; --line:#262522;
+  --accent:#CFA75A; --accent-soft:rgba(207,167,90,.12);
+  --f:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --ease:cubic-bezier(.2,.7,.1,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px;overflow-x:hidden}
+::selection{background:var(--accent);color:var(--bg)}
+a{color:inherit;text-decoration-color:var(--line);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.wrap{max-width:720px;margin:0 auto;position:relative}
+h1,h2,h3,p,ul{margin:0}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+/* ambient glow */
+.glow{position:fixed;top:-140px;right:-160px;width:420px;height:420px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(207,167,90,.16),transparent 65%);filter:blur(10px);z-index:0}
+.wrap>*:not(.glow){position:relative;z-index:1}
+
+/* top */
+.top{display:flex;justify-content:space-between;align-items:center;padding-block:20px}
+.mark{display:flex;align-items:center;gap:10px;font-weight:600}
+.mark i{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+/* hero */
+.hero{padding-block:36px 28px}
+.hero h1{font-size:clamp(44px,10vw,72px);line-height:1;letter-spacing:-.045em;font-weight:600;display:flex}
+.hero h1 span{display:inline-block}
+.hero p{margin-top:12px;color:var(--soft);font-size:17px;max-width:40ch}
+
+/* brief */
+.brief{margin-top:8px;border-top:1px solid var(--line)}
+.brief li{list-style:none;display:flex;gap:14px;align-items:baseline;padding-block:14px;border-bottom:1px solid var(--line);font-size:17px;line-height:1.4}
+.brief ul{padding:0}
+.brief li::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--accent);transform:translateY(-3px)}
+.brief .h{display:flex;justify-content:space-between;align-items:baseline;margin:40px 0 4px}
+.brief .h h2,.tabs-h h2{font-size:24px;font-weight:600;letter-spacing:-.02em}
+
+/* tabs */
+.tabs-h{margin:48px 0 14px}
+.seg{position:relative;display:inline-grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:8px}
+.seg button{position:relative;z-index:1;padding:9px 20px;border-radius:999px;font-weight:500;font-size:15px;color:var(--soft);transition:color .3s var(--ease);white-space:nowrap;text-align:center}
+.seg button[aria-selected="true"]{color:var(--bg)}
+.seg button sup{font-family:var(--f-mono);font-size:10px;margin-left:4px;opacity:.7}
+.pill{position:absolute;top:4px;bottom:4px;left:4px;border-radius:999px;background:var(--accent);transition:transform .45s var(--ease),width .45s var(--ease)}
+
+/* rows */
+.panel{border-top:1px solid var(--line)}
+.panel[hidden]{display:none}
+.row{border-bottom:1px solid var(--line)}
+.row>button{width:100%;display:grid;grid-template-columns:minmax(0,1fr) 28px;gap:14px;align-items:start;padding-block:18px}
+.row .t{font-size:18px;font-weight:600;line-height:1.3;letter-spacing:-.01em}
+.row .s{display:block;margin-top:4px;color:var(--soft);font-size:15px;line-height:1.45}
+.row .m{display:block;margin-bottom:6px}
+.row .m b{color:var(--accent);font-weight:400}
+.plus{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);position:relative;margin-top:2px;transition:background .3s var(--ease),border-color .3s var(--ease),transform .45s var(--ease)}
+.plus::before,.plus::after{content:"";position:absolute;left:50%;top:50%;width:10px;height:1.5px;background:var(--ink);transform:translate(-50%,-50%)}
+.plus::after{transform:translate(-50%,-50%) rotate(90deg)}
+.row>button:hover .plus{border-color:var(--accent)}
+.row.open .plus{transform:rotate(45deg);background:var(--accent);border-color:var(--accent)}
+.row.open .plus::before,.row.open .plus::after{background:var(--bg)}
+.body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--ease)}
+.row.open .body{grid-template-rows:1fr}
+.body>div{overflow:hidden}
+.in{padding:0 42px 20px 0;display:grid;gap:12px;opacity:0;transform:translateY(-6px);transition:opacity .35s var(--ease),transform .35s var(--ease)}
+.row.open .in{opacity:1;transform:none;transition-delay:.08s}
+.in p{color:var(--soft);font-size:15px}
+.try{padding:12px 14px;border-radius:12px;background:var(--accent-soft);font-size:15px}
+.try span{display:block;font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
+.src{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+
+/* archive */
+.arch{margin-top:56px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:18px;border-top:1px solid var(--line)}
+
+@media (max-width:520px){
+  .seg{display:grid;width:100%}
+  .seg button{padding:9px 10px}
+  .in{padding-right:0}
+  .brief li{font-size:16px}
+}
+
+/* motion: only on load and interaction */
+@media (prefers-reduced-motion:no-preference){
+  .hero h1 span{animation:letter .7s var(--ease) both;animation-delay:calc(var(--i)*45ms)}
+  @keyframes letter{from{opacity:0;transform:translateY(.35em)}to{opacity:1;transform:none}}
+  .hero p,.brief li{animation:fade .6s var(--ease) both}
+  .hero p{animation-delay:.4s}
+  .brief li{animation-delay:calc(.5s + var(--i)*70ms)}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .glow{animation:drift 14s ease-in-out infinite alternate}
+  @keyframes drift{to{transform:translate(-60px,40px) scale(1.15)}}
+  .panel.enter .row{animation:fade .45s var(--ease) both;animation-delay:calc(var(--i)*45ms)}
+  .mark i{animation:pulse 2.8s ease-in-out infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 6px rgba(207,167,90,.15)}}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="glow" aria-hidden="true"></div>
+
+  <header class="top">
+    <div class="mark"><i aria-hidden="true"></i>Ротация</div>
+    <span class="lbl">Выпуск 01 · 16.10.2026</span>
+  </header>
+
+  <div class="hero">
+    <h1 aria-label="Ротация"><span style="--i:0">Р</span><span style="--i:1">о</span><span style="--i:2">т</span><span style="--i:3">а</span><span style="--i:4">ц</span><span style="--i:5">и</span><span style="--i:6">я</span></h1>
+    <p>Новые механики внутренних переходов и главные новости.</p>
+  </div>
+
+  <section class="brief" aria-labelledby="brief-h" style="border-top:0">
+    <div class="h"><h2 id="brief-h">Коротко</h2><span class="lbl">5 мыслей</span></div>
+    <ul>
+      <li style="--i:0">Вакансии сами находят сотрудника: ИИ-агенты присылают подборку в мессенджер</li>
+      <li style="--i:1">Schneider Electric убрала согласие руководителя из правил перехода</li>
+      <li style="--i:2">Переход можно «примерить» через частичную занятость в новой команде</li>
+      <li style="--i:3">Роструд: при переводе испытательный срок не ставится</li>
+      <li style="--i:4">Программы переходов видят только 19% сотрудников</li>
+    </ul>
+  </section>
+
+  <section aria-label="Фишки и новости">
+    <div class="tabs-h">
+      <div class="seg" role="tablist" aria-label="Раздел">
+        <span class="pill" aria-hidden="true"></span>
+        <button role="tab" id="tab-tricks" aria-controls="p-tricks" aria-selected="true">Фишки<sup>6</sup></button>
+        <button role="tab" id="tab-news" aria-controls="p-news" aria-selected="false" tabindex="-1">Новости<sup>7</sup></button>
+      </div>
+    </div>
+
+    <div class="panel" id="p-tricks" role="tabpanel" aria-labelledby="tab-tricks">
+      <div class="row" style="--i:0"><button aria-expanded="false" id="t1"><span><span class="m lbl"><b>Workday · Fuel50</b></span><span class="t">ИИ-агент сам приносит вакансии</span><span class="s">Подборка внутренних ролей приходит в почту или Teams</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>Агент сверяет навыки и интересы сотрудника с открытыми ролями. Fuel50 присылает подсказку, когда появилась новая роль или закончился проект.</p>
+          <div class="try"><span>Попробовать</span>Бот раз в неделю присылает каждому 2–3 вакансии под его навыки.</div>
+          <div class="src"><a href="https://digidai.github.io/2026/10/09/workday-mobility-agent-internal-career-freeze/">Workday, окт 2026</a> · <a href="https://natlawreview.com/press-releases/fuel50-launches-career-advisor-agent-bring-trusted-ai-career-guidance-flow">Fuel50, май 2026</a></div>
+        </div></div></div></div>
+
+      <div class="row" style="--i:1"><button aria-expanded="false" id="t2"><span><span class="m lbl"><b>Schneider Electric</b></span><span class="t">Переход без разрешения руководителя</span><span class="s">Платформой пользуются 89% из 120 тысяч сотрудников</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>Убрали два барьера: три года стажа в роли и согласие начальника.</p>
+          <div class="try"><span>Попробовать</span>Руководителя уведомляют о переходе и дают срок на передачу дел.</div>
+          <div class="src"><a href="https://ovi-me.com/blog/schneider-electric-ai-talent-marketplace">ovi-me.com, 2026</a></div>
+        </div></div></div></div>
+
+      <div class="row" style="--i:2"><button aria-expanded="false" id="t3"><span><span class="m lbl"><b>Технониколь · Schneider</b></span><span class="t">Пробный переход</span><span class="s">Частичная занятость или 20% времени в другой команде</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>Сотрудник сначала берёт проект или часть задач новой функции и только потом переводится полностью.</p>
+          <div class="try"><span>Попробовать</span>1–2 месяца частичной занятости для переходов со сменой специализации.</div>
+          <div class="src"><a href="https://www.kommersant.ru/doc/8989672">Коммерсантъ, сен 2026</a></div>
+        </div></div></div></div>
+
+      <div class="row" style="--i:3"><button aria-expanded="false" id="t4"><span><span class="m lbl"><b>МТС</b></span><span class="t">Одна оценка для найма и перехода</span><span class="s">9 рабочих дней, запись интервью видит сотрудник</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>Раньше четверть сотрудников не проходила отбор на ротацию из-за размытых требований. Сделали общие матрицы компетенций, апелляций почти не стало.</p>
+          <div class="try"><span>Попробовать</span>Внутренний кандидат проходит то же интервью, что и внешний, и получает разбор.</div>
+          <div class="src"><a href="https://habr.com/ru/companies/ru_mts/articles/1042354/">Хабр, июнь 2026</a></div>
+        </div></div></div></div>
+
+      <div class="row" style="--i:4"><button aria-expanded="false" id="t5"><span><span class="m lbl"><b>Delta Electronics</b></span><span class="t">Ротация как условие повышения</span><span class="s">Без опыта в другой роли на следующий грейд не перейти</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>Компания поддерживает правило обучением, чтобы растить сотрудников с несколькими навыками.</p>
+          <div class="try"><span>Попробовать</span>Для руководящего грейда требовать одну ротацию или проект в другой команде.</div>
+          <div class="src"><a href="https://www.humanresourcesonline.net/talent-mobility-trends-shaping-the-workforce-in-2026">HR Online, дек 2025</a></div>
+        </div></div></div></div>
+
+      <div class="row" style="--i:5"><button aria-expanded="false" id="t6"><span><span class="m lbl"><b>Метрики</b></span><span class="t">Воронка мобильности</span><span class="s">Считать путь от «подходит» до «перешёл и работает»</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>Шаги: увидел вакансию → откликнулся → руководитель отпустил → перешёл → результат через 6–12 месяцев.</p>
+          <div class="try"><span>Попробовать</span>Собрать дашборд и найти шаг, где теряется больше всего людей.</div>
+          <div class="src"><a href="https://digidai.github.io/2026/10/09/workday-mobility-agent-internal-career-freeze/">Разбор, окт 2026</a></div>
+        </div></div></div></div>
+    </div>
+
+    <div class="panel" id="p-news" role="tabpanel" aria-labelledby="tab-news" hidden>
+      <div class="row" style="--i:0"><button aria-expanded="false" id="n1"><span><span class="m lbl"><b>Мир</b> · 9 окт</span><span class="t">У 57% компаний переходов стало меньше</span><span class="s">Данные Workday: мешают заморозка найма и руководители</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>ИИ-подбор не помогает, если позицию не финансируют или сотрудника не отпускают.</p><div class="src"><a href="https://digidai.github.io/2026/10/09/workday-mobility-agent-internal-career-freeze/">digidai.github.io</a></div></div></div></div></div>
+
+      <div class="row" style="--i:1"><button aria-expanded="false" id="n2"><span><span class="m lbl"><b>Россия</b> · 29 сен</span><span class="t">77% новых CEO пришли изнутри</span><span class="s">В сотне крупнейших компаний, год назад было 55%</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>При этом кадровыми резервами довольны только 13% компаний: людей готовят, но не назначают.</p><div class="src"><a href="https://www.kommersant.ru/doc/8989672">Коммерсантъ</a></div></div></div></div></div>
+
+      <div class="row" style="--i:2"><button aria-expanded="false" id="n3"><span><span class="m lbl"><b>Россия</b> · Сентябрь</span><span class="t">Рынок труда стал рынком работодателя</span><span class="s">hh.индекс 8,5: вакансий −13%, резюме +15% за год</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Но 93% работодателей не находят у кандидатов нужных навыков.</p><div class="src"><a href="https://stats.hh.ru/api/v1/monthly-report/f-0ea16d35-6a6c-426f-a29a-eb984049a734">hh.ru</a></div></div></div></div></div>
+
+      <div class="row" style="--i:3"><button aria-expanded="false" id="n4"><span><span class="m lbl"><b>Россия</b> · 27 июл</span><span class="t">При переводе нельзя ставить испытательный срок</span><span class="s">Разъяснение Роструда</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Перевод не создаёт новый трудовой договор. Проверить человека в новой роли можно только до перевода, например через пробный проект.</p><div class="src"><a href="https://www.klerk.ru/buh/news/701704/">Клерк</a></div></div></div></div></div>
+
+      <div class="row" style="--i:4"><button aria-expanded="false" id="n5"><span><span class="m lbl"><b>Мир</b> · 13 июл</span><span class="t">Нанять заново дороже, чем перевести</span><span class="s">Так считают 73% компаний, которые это измеряют</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Число переводов отслеживают только 30% организаций. Опрос LHH, 11 тысяч человек в семи странах.</p><div class="src"><a href="https://www.lhh.com/en-gb/insights/the-mobility-breakdown">LHH</a></div></div></div></div></div>
+
+      <div class="row" style="--i:5"><button aria-expanded="false" id="n6"><span><span class="m lbl"><b>Мир</b> · 30 июн</span><span class="t">JD.com переобучает вместо сокращений</span><span class="s">Складских сотрудников переводят на обслуживание роботов</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Стриминг Tubi помогает сотрудникам менять роли и переезжать в другие страны.</p><div class="src"><a href="https://english.ckgsb.edu.cn/knowledge/article/ai-workforce-turnover-internal-mobility/">CKGSB · WEF</a></div></div></div></div></div>
+
+      <div class="row" style="--i:6"><button aria-expanded="false" id="n7"><span><span class="m lbl"><b>Россия</b> · 2026</span><span class="t">X5 добавила профили навыков</span><span class="s">Для 426 тысяч сотрудников в приложении «Сфера»</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Система подсказывает, где сотрудник может принести больше пользы.</p><div class="src"><a href="https://logistics.ru/avtomatizaciya-logistiki-upravlenie-logistikoy-i-kompaniey/sfera-x5-kak-krupneyshiy-riteyler-rossii">logistics.ru</a></div></div></div></div></div>
+    </div>
+  </section>
+
+  <footer class="arch">
+    <span class="lbl">Выпуск 01 · 16.10.2026</span>
+    <span class="lbl">Следующий скоро</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  // accordion
+  document.querySelectorAll('.row>button').forEach(function(b){
+    b.addEventListener('click',function(){
+      var row=b.parentElement, open=!row.classList.contains('open');
+      row.classList.toggle('open',open); b.setAttribute('aria-expanded',String(open));
+    });
+  });
+  // tabs with sliding pill
+  var tabs=[].slice.call(document.querySelectorAll('[role=tab]')), pill=document.querySelector('.pill');
+  function place(t){pill.style.width=t.offsetWidth+'px';pill.style.transform='translateX('+(t.offsetLeft-4)+'px)';}
+  function select(t,focus){
+    tabs.forEach(function(x){
+      var on=x===t; x.setAttribute('aria-selected',String(on)); x.tabIndex=on?0:-1;
+      var p=document.getElementById(x.getAttribute('aria-controls')); p.hidden=!on;
+      if(on){p.classList.remove('enter');void p.offsetWidth;p.classList.add('enter');}
+    });
+    place(t); if(focus)t.focus();
+  }
+  tabs.forEach(function(t,i){
+    t.addEventListener('click',function(){select(t)});
+    t.addEventListener('keydown',function(e){
+      if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();select(tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length],true);}
+    });
+  });
+  function init(){place(tabs.filter(function(t){return t.getAttribute('aria-selected')==='true'})[0]);}
+  init(); window.addEventListener('resize',init);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(init);
+})();
+</script>
+
+</body>
+</html>
