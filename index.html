@@ -116,6 +116,16 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   @keyframes pulse{50%{box-shadow:0 0 0 6px rgba(207,167,90,.15)}}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* issues archive */
+.issues{margin-top:56px}
+.issues h2{font-size:24px;font-weight:600;letter-spacing:-.02em;margin-bottom:12px}
+.iss{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:14px;align-items:baseline;padding-block:14px;border-top:1px solid var(--line);text-decoration:none;color:var(--soft);transition:color .2s}
+.iss:last-child{border-bottom:1px solid var(--line)}
+.iss:hover{color:var(--ink)}
+.iss .n{font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink)}
+.iss.cur .n{color:var(--accent)}
+@media (max-width:520px){.iss{grid-template-columns:32px minmax(0,1fr)}.iss .lbl{grid-column:2}}
 </style>
 </head>
 <body>
@@ -125,7 +135,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 
   <header class="top">
     <div class="mark"><i aria-hidden="true"></i>Ротация</div>
-    <span class="lbl">Выпуск 01 · 16.10.2026</span>
+    <span class="lbl">Выпуск 02 · 03.11.2026</span>
   </header>
 
   <div class="hero">
@@ -136,11 +146,11 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   <section class="brief" aria-labelledby="brief-h" style="border-top:0">
     <div class="h"><h2 id="brief-h">Коротко</h2><span class="lbl">5 мыслей</span></div>
     <ul>
-      <li style="--i:0">Вакансии сами находят сотрудника: ИИ-агенты присылают подборку в мессенджер</li>
-      <li style="--i:1">Schneider Electric убрала согласие руководителя из правил перехода</li>
-      <li style="--i:2">Переход можно «примерить» через частичную занятость в новой команде</li>
-      <li style="--i:3">Роструд: при переводе испытательный срок не ставится</li>
-      <li style="--i:4">Программы переходов видят только 19% сотрудников</li>
+      <li style="--i:0">Профиль навыков теперь собирает ИИ из рабочих данных, а не сам сотрудник</li>
+      <li style="--i:1">В «Слетать.ру» будущую ротацию обсуждают ещё на собеседовании</li>
+      <li style="--i:2">ДОМ.РФ временно переводит людей в перегруженные отделы с сохранением зарплаты</li>
+      <li style="--i:3">Intuit оплачивает ротации из общего бюджета, а не из бюджета команды</li>
+      <li style="--i:4">BCG: за 2–3 года изменится половина работ, исчезнет только 10–15%</li>
     </ul>
   </section>
 
@@ -149,82 +159,77 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
       <div class="seg" role="tablist" aria-label="Раздел">
         <span class="pill" aria-hidden="true"></span>
         <button role="tab" id="tab-tricks" aria-controls="p-tricks" aria-selected="true">Фишки<sup>6</sup></button>
-        <button role="tab" id="tab-news" aria-controls="p-news" aria-selected="false" tabindex="-1">Новости<sup>7</sup></button>
+        <button role="tab" id="tab-news" aria-controls="p-news" aria-selected="false" tabindex="-1">Новости<sup>5</sup></button>
       </div>
     </div>
 
     <div class="panel" id="p-tricks" role="tabpanel" aria-labelledby="tab-tricks">
-      <div class="row" style="--i:0"><button aria-expanded="false" id="t1"><span><span class="m lbl"><b>Workday · Fuel50</b></span><span class="t">ИИ-агент сам приносит вакансии</span><span class="s">Подборка внутренних ролей приходит в почту или Teams</span></span><span class="plus" aria-hidden="true"></span></button>
+      <div class="row" style="--i:0"><button aria-expanded="false" id="t1"><span><span class="m lbl"><b>Oracle · Workday</b></span><span class="t">Профиль навыков собирается сам</span><span class="s">ИИ определяет навыки по задачам и проектам сотрудника</span></span><span class="plus" aria-hidden="true"></span></button>
         <div class="body"><div><div class="in">
-          <p>Агент сверяет навыки и интересы сотрудника с открытыми ролями. Fuel50 присылает подсказку, когда появилась новая роль или закончился проект.</p>
-          <div class="try"><span>Попробовать</span>Бот раз в неделю присылает каждому 2–3 вакансии под его навыки.</div>
-          <div class="src"><a href="https://digidai.github.io/2026/10/09/workday-mobility-agent-internal-career-freeze/">Workday, окт 2026</a> · <a href="https://natlawreview.com/press-releases/fuel50-launches-career-advisor-agent-bring-trusted-ai-career-guidance-flow">Fuel50, май 2026</a></div>
+          <p>Агент Oracle обновляет профиль по данным из рабочих систем, без ручного заполнения. Workday в октябре открыл ранний доступ к инструменту, который раскладывает каждую роль на задачи и навыки по справочнику из 75 тысяч навыков.</p>
+          <div class="try"><span>Попробовать</span>Подтягивать в профиль кандидата на ротацию навыки из его задач и проектов, а не из анкеты.</div>
+          <div class="src"><a href="https://www.prnewswire.com/news-releases/oracle-adds-new-fusion-agentic-applications-and-ai-agents-to-help-organizations-improve-talent-management-302847997.html">Oracle, авг 2026</a> · <a href="https://www.silvercloudhr.co.uk/insights/movers-shakers-hr-tech-landscape-in-october-2026">Workday, окт 2026</a></div>
         </div></div></div></div>
 
-      <div class="row" style="--i:1"><button aria-expanded="false" id="t2"><span><span class="m lbl"><b>Schneider Electric</b></span><span class="t">Переход без разрешения руководителя</span><span class="s">Платформой пользуются 89% из 120 тысяч сотрудников</span></span><span class="plus" aria-hidden="true"></span></button>
+      <div class="row" style="--i:1"><button aria-expanded="false" id="t2"><span><span class="m lbl"><b>Слетать.ру</b></span><span class="t">Ротация, запланированная при найме</span><span class="s">Переход в профильный отдел через 6–12 месяцев</span></span><span class="plus" aria-hidden="true"></span></button>
         <div class="body"><div><div class="in">
-          <p>Убрали два барьера: три года стажа в роли и согласие начальника.</p>
-          <div class="try"><span>Попробовать</span>Руководителя уведомляют о переходе и дают срок на передачу дел.</div>
-          <div class="src"><a href="https://ovi-me.com/blog/schneider-electric-ai-talent-marketplace">ovi-me.com, 2026</a></div>
+          <p>Все новички начинают в контакт-центре, а на собеседовании с ними сразу обсуждают следующую роль. Из одной стартовой позиции есть несколько треков: в продажи или в бронирование. Так компания закрывает изнутри до двух третей вакансий.</p>
+          <div class="try"><span>Попробовать</span>Для массовых входных ролей заранее описать 2–3 трека перехода и называть их на найме.</div>
+          <div class="src"><a href="https://global38.ru/news/id/10067">global38.ru, июль 2026</a></div>
         </div></div></div></div>
 
-      <div class="row" style="--i:2"><button aria-expanded="false" id="t3"><span><span class="m lbl"><b>Технониколь · Schneider</b></span><span class="t">Пробный переход</span><span class="s">Частичная занятость или 20% времени в другой команде</span></span><span class="plus" aria-hidden="true"></span></button>
+      <div class="row" style="--i:2"><button aria-expanded="false" id="t3"><span><span class="m lbl"><b>ДОМ.РФ · Авито</b></span><span class="t">Временное подкрепление команды</span><span class="s">Сотрудник помогает перегруженному отделу и возвращается</span></span><span class="plus" aria-hidden="true"></span></button>
         <div class="body"><div><div class="in">
-          <p>Сотрудник сначала берёт проект или часть задач новой функции и только потом переводится полностью.</p>
-          <div class="try"><span>Попробовать</span>1–2 месяца частичной занятости для переходов со сменой специализации.</div>
-          <div class="src"><a href="https://www.kommersant.ru/doc/8989672">Коммерсантъ, сен 2026</a></div>
+          <p>В ДОМ.РФ людей переводят туда, где не хватает рук, с сохранением зарплаты и премий. Куда переводить, решают по ежемесячному анализу нагрузки. В Авито похожий формат: подкрепление соседнего юнита на полгода.</p>
+          <div class="try"><span>Попробовать</span>Предлагать временное подкрепление как пробный шаг перед полной ротацией.</div>
+          <div class="src"><a href="https://global38.ru/news/id/10067">global38.ru</a> · <a href="https://habr.com/ru/companies/avito/articles/898888/">Хабр, Авито</a></div>
         </div></div></div></div>
 
-      <div class="row" style="--i:3"><button aria-expanded="false" id="t4"><span><span class="m lbl"><b>МТС</b></span><span class="t">Одна оценка для найма и перехода</span><span class="s">9 рабочих дней, запись интервью видит сотрудник</span></span><span class="plus" aria-hidden="true"></span></button>
+      <div class="row" style="--i:3"><button aria-expanded="false" id="t4"><span><span class="m lbl"><b>Intuit</b></span><span class="t">Ротации оплачивает центр</span><span class="s">Принимающая команда не тратит свой бюджет</span></span><span class="plus" aria-hidden="true"></span></button>
         <div class="body"><div><div class="in">
-          <p>Раньше четверть сотрудников не проходила отбор на ротацию из-за размытых требований. Сделали общие матрицы компетенций, апелляций почти не стало.</p>
-          <div class="try"><span>Попробовать</span>Внутренний кандидат проходит то же интервью, что и внешний, и получает разбор.</div>
-          <div class="src"><a href="https://habr.com/ru/companies/ru_mts/articles/1042354/">Хабр, июнь 2026</a></div>
+          <p>Программа ротаций продакт-менеджеров работает больше 20 лет. Деньги на неё выделяются централизованно, поэтому командам проще брать людей на ротацию.</p>
+          <div class="try"><span>Попробовать</span>Отдельный бюджет на переходы, чтобы ставка не «висела» на принимающей команде в первые месяцы.</div>
+          <div class="src"><a href="https://global38.ru/news/id/10067">global38.ru</a></div>
         </div></div></div></div>
 
-      <div class="row" style="--i:4"><button aria-expanded="false" id="t5"><span><span class="m lbl"><b>Delta Electronics</b></span><span class="t">Ротация как условие повышения</span><span class="s">Без опыта в другой роли на следующий грейд не перейти</span></span><span class="plus" aria-hidden="true"></span></button>
+      <div class="row" style="--i:4"><button aria-expanded="false" id="t5"><span><span class="m lbl"><b>BCG · HR Tech 2026</b></span><span class="t">Карта ролей, которые изменит ИИ</span><span class="s">Заранее понять, кого и куда переводить</span></span><span class="plus" aria-hidden="true"></span></button>
         <div class="body"><div><div class="in">
-          <p>Компания поддерживает правило обучением, чтобы растить сотрудников с несколькими навыками.</p>
-          <div class="try"><span>Попробовать</span>Для руководящего грейда требовать одну ротацию или проект в другой команде.</div>
-          <div class="src"><a href="https://www.humanresourcesonline.net/talent-mobility-trends-shaping-the-workforce-in-2026">HR Online, дек 2025</a></div>
+          <p>BCG оценивает, что за 2–3 года ИИ заметно изменит 50–55% работ, а заменить может 10–15%. Компания советует планировать переводы заранее. На HR Tech 2026 показали сервис, который находит роли, которые останутся ценными при росте ИИ.</p>
+          <div class="try"><span>Попробовать</span>Отметить роли с высоким риском автоматизации и заранее предлагать этим людям ротацию.</div>
+          <div class="src"><a href="https://www.bcg.com/publications/2026/ai-will-reshape-more-jobs-than-it-replaces">BCG</a> · <a href="https://www.globenewswire.com/news-release/2026/10/13/3379519/0/en/scores-of-new-products-get-ready-to-launch-at-hr-tech-2026.html">HR Tech, окт 2026</a></div>
         </div></div></div></div>
 
-      <div class="row" style="--i:5"><button aria-expanded="false" id="t6"><span><span class="m lbl"><b>Метрики</b></span><span class="t">Воронка мобильности</span><span class="s">Считать путь от «подходит» до «перешёл и работает»</span></span><span class="plus" aria-hidden="true"></span></button>
+      <div class="row" style="--i:5"><button aria-expanded="false" id="t6"><span><span class="m lbl"><b>Авито</b></span><span class="t">Чек-лист сотрудника перед переходом</span><span class="s">Что проверить, чтобы ротация не стала шагом назад</span></span><span class="plus" aria-hidden="true"></span></button>
         <div class="body"><div><div class="in">
-          <p>Шаги: увидел вакансию → откликнулся → руководитель отпустил → перешёл → результат через 6–12 месяцев.</p>
-          <div class="try"><span>Попробовать</span>Собрать дашборд и найти шаг, где теряется больше всего людей.</div>
-          <div class="src"><a href="https://digidai.github.io/2026/10/09/workday-mobility-agent-internal-career-freeze/">Разбор, окт 2026</a></div>
+          <p>Собрать обратную связь от руководителя и команды, посмотреть оценки за 2–3 последних ревью, изучить бэклог новой команды и заранее договориться с новым руководителем об ожиданиях.</p>
+          <div class="try"><span>Попробовать</span>Отправлять такой чек-лист каждому, кто подаёт заявку на ротацию.</div>
+          <div class="src"><a href="https://habr.com/ru/companies/avito/articles/898888/">Хабр, Авито</a></div>
         </div></div></div></div>
     </div>
 
     <div class="panel" id="p-news" role="tabpanel" aria-labelledby="tab-news" hidden>
-      <div class="row" style="--i:0"><button aria-expanded="false" id="n1"><span><span class="m lbl"><b>Мир</b> · 9 окт</span><span class="t">У 57% компаний переходов стало меньше</span><span class="s">Данные Workday: мешают заморозка найма и руководители</span></span><span class="plus" aria-hidden="true"></span></button>
-        <div class="body"><div><div class="in"><p>ИИ-подбор не помогает, если позицию не финансируют или сотрудника не отпускают.</p><div class="src"><a href="https://digidai.github.io/2026/10/09/workday-mobility-agent-internal-career-freeze/">digidai.github.io</a></div></div></div></div></div>
+      <div class="row" style="--i:0"><button aria-expanded="false" id="n1"><span><span class="m lbl"><b>Мир</b> · 27 окт</span><span class="t">Dayforce показала, вырастить навык или нанять</span><span class="s">Руководитель видит пробелы в навыках команды</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>В обновлённой системе оценки менеджер видит, какие навыки можно развить внутри команды, а где нужен новый человек. ИИ-агенты уже доступны, остальные функции выйдут в 2027 году.</p><div class="src"><a href="https://www.globenewswire.com/news-release/2026/10/27/3389571/0/en/dayforce-introduces-agentic-talent-experiences-to-transform-how-organizations-hire-and-develop-talent.html">GlobeNewswire</a></div></div></div></div></div>
 
-      <div class="row" style="--i:1"><button aria-expanded="false" id="n2"><span><span class="m lbl"><b>Россия</b> · 29 сен</span><span class="t">77% новых CEO пришли изнутри</span><span class="s">В сотне крупнейших компаний, год назад было 55%</span></span><span class="plus" aria-hidden="true"></span></button>
-        <div class="body"><div><div class="in"><p>При этом кадровыми резервами довольны только 13% компаний: людей готовят, но не назначают.</p><div class="src"><a href="https://www.kommersant.ru/doc/8989672">Коммерсантъ</a></div></div></div></div></div>
+      <div class="row" style="--i:1"><button aria-expanded="false" id="n2"><span><span class="m lbl"><b>Мир</b> · 13 окт</span><span class="t">Workday раскладывает работу на задачи и навыки</span><span class="s">Видно, где ИИ поможет, а где нужен человек</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Инструмент Work Intelligence показывает, какие задачи можно автоматизировать и где ценны навыки людей. Пока он в раннем доступе для клиентов Workday.</p><div class="src"><a href="https://www.silvercloudhr.co.uk/insights/movers-shakers-hr-tech-landscape-in-october-2026">SilverCloud HR</a></div></div></div></div></div>
 
-      <div class="row" style="--i:2"><button aria-expanded="false" id="n3"><span><span class="m lbl"><b>Россия</b> · Сентябрь</span><span class="t">Рынок труда стал рынком работодателя</span><span class="s">hh.индекс 8,5: вакансий −13%, резюме +15% за год</span></span><span class="plus" aria-hidden="true"></span></button>
-        <div class="body"><div><div class="in"><p>Но 93% работодателей не находят у кандидатов нужных навыков.</p><div class="src"><a href="https://stats.hh.ru/api/v1/monthly-report/f-0ea16d35-6a6c-426f-a29a-eb984049a734">hh.ru</a></div></div></div></div></div>
+      <div class="row" style="--i:2"><button aria-expanded="false" id="n3"><span><span class="m lbl"><b>Мир</b> · 7 окт</span><span class="t">Свои сотрудники дают компании преимущество</span><span class="s">Питер Каппелли призывает HR сокращать внешний найм</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Профессор Уортона пишет, что компании, которые продвигают людей изнутри, выигрывают у конкурентов, и HR стоит бороться за меньший найм со стороны.</p><div class="src"><a href="https://hrexecutive.com/internal-mobility-why-insiders-have-the-advantage/">HR Executive</a></div></div></div></div></div>
 
-      <div class="row" style="--i:3"><button aria-expanded="false" id="n4"><span><span class="m lbl"><b>Россия</b> · 27 июл</span><span class="t">При переводе нельзя ставить испытательный срок</span><span class="s">Разъяснение Роструда</span></span><span class="plus" aria-hidden="true"></span></button>
-        <div class="body"><div><div class="in"><p>Перевод не создаёт новый трудовой договор. Проверить человека в новой роли можно только до перевода, например через пробный проект.</p><div class="src"><a href="https://www.klerk.ru/buh/news/701704/">Клерк</a></div></div></div></div></div>
+      <div class="row" style="--i:3"><button aria-expanded="false" id="n4"><span><span class="m lbl"><b>Мир</b> · Октябрь</span><span class="t">На HR Tech 2026 почти нет внутренних бирж</span><span class="s">Новинки в основном про внешний найм</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Ближе всего к теме сервисы для планирования преемников и для поиска ролей, устойчивых к ИИ. Отдельных продуктов для внутренних переходов среди анонсов нет.</p><div class="src"><a href="https://www.globenewswire.com/news-release/2026/10/13/3379519/0/en/scores-of-new-products-get-ready-to-launch-at-hr-tech-2026.html">GlobeNewswire</a></div></div></div></div></div>
 
-      <div class="row" style="--i:4"><button aria-expanded="false" id="n5"><span><span class="m lbl"><b>Мир</b> · 13 июл</span><span class="t">Нанять заново дороже, чем перевести</span><span class="s">Так считают 73% компаний, которые это измеряют</span></span><span class="plus" aria-hidden="true"></span></button>
-        <div class="body"><div><div class="in"><p>Число переводов отслеживают только 30% организаций. Опрос LHH, 11 тысяч человек в семи странах.</p><div class="src"><a href="https://www.lhh.com/en-gb/insights/the-mobility-breakdown">LHH</a></div></div></div></div></div>
-
-      <div class="row" style="--i:5"><button aria-expanded="false" id="n6"><span><span class="m lbl"><b>Мир</b> · 30 июн</span><span class="t">JD.com переобучает вместо сокращений</span><span class="s">Складских сотрудников переводят на обслуживание роботов</span></span><span class="plus" aria-hidden="true"></span></button>
-        <div class="body"><div><div class="in"><p>Стриминг Tubi помогает сотрудникам менять роли и переезжать в другие страны.</p><div class="src"><a href="https://english.ckgsb.edu.cn/knowledge/article/ai-workforce-turnover-internal-mobility/">CKGSB · WEF</a></div></div></div></div></div>
-
-      <div class="row" style="--i:6"><button aria-expanded="false" id="n7"><span><span class="m lbl"><b>Россия</b> · 2026</span><span class="t">X5 добавила профили навыков</span><span class="s">Для 426 тысяч сотрудников в приложении «Сфера»</span></span><span class="plus" aria-hidden="true"></span></button>
-        <div class="body"><div><div class="in"><p>Система подсказывает, где сотрудник может принести больше пользы.</p><div class="src"><a href="https://logistics.ru/avtomatizaciya-logistiki-upravlenie-logistikoy-i-kompaniey/sfera-x5-kak-krupneyshiy-riteyler-rossii">logistics.ru</a></div></div></div></div></div>
+      <div class="row" style="--i:4"><button aria-expanded="false" id="n5"><span><span class="m lbl"><b>Россия</b> · 2026</span><span class="t">Половина компаний назвала мобильность приоритетом</span><span class="s">52,7% компаний включили её в ключевые задачи года</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Растёт и внутреннее совместительство: около 10% компаний увеличили число сотрудников, которые совмещают две роли.</p><div class="src"><a href="https://new-retail.ru/business/spros_na_vnutrennee_sovmestitelstvo_v_2026/">New Retail</a></div></div></div></div></div>
     </div>
   </section>
 
-  <footer class="arch">
-    <span class="lbl">Выпуск 01 · 16.10.2026</span>
-    <span class="lbl">Следующий скоро</span>
-  </footer>
+  <section class="issues" aria-labelledby="issues-h">
+    <h2 id="issues-h">Выпуски</h2>
+    <a class="iss cur" href="./" aria-current="page"><span class="n">02</span><span>Навыки из рабочих данных, ротация с первого дня, подкрепление команд</span><span class="lbl">03.11.2026</span></a>
+    <a class="iss" href="issues/01.html"><span class="n">01</span><span>ИИ-агенты для переходов, переход без согласия руководителя</span><span class="lbl">16.10.2026</span></a>
+  </section>
 </div>
 
 <script>
