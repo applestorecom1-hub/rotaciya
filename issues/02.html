@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ротация</title>
+<meta name="description" content="Дайджест внутренней мобильности: новые механики переходов между командами и главные новости.">
+<meta property="og:title" content="Ротация">
+<meta property="og:description" content="Новые механики внутренних переходов и главные новости.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0F0F0E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230F0F0E'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23CFA75A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: одна узкая колонка для чтения. Шапка → «Коротко» → вкладки «Фишки / Новости» → строки-аккордеоны. Детали скрыты, пока их не открыли. Single dark look by design. */
+:root{
+  --bg:#0F0F0E; --surface:#171715; --surface-2:#1E1E1C; --ink:#ECEAE4; --soft:#B4B1A9; --muted:#7F7C75; --line:#262522;
+  --accent:#CFA75A; --accent-soft:rgba(207,167,90,.12);
+  --f:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --ease:cubic-bezier(.2,.7,.1,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px;overflow-x:hidden}
+::selection{background:var(--accent);color:var(--bg)}
+a{color:inherit;text-decoration-color:var(--line);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.wrap{max-width:720px;margin:0 auto;position:relative}
+h1,h2,h3,p,ul{margin:0}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+/* ambient glow */
+.glow{position:fixed;top:-140px;right:-160px;width:420px;height:420px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(207,167,90,.16),transparent 65%);filter:blur(10px);z-index:0}
+.wrap>*:not(.glow){position:relative;z-index:1}
+
+/* top */
+.top{display:flex;justify-content:space-between;align-items:center;padding-block:20px}
+.mark{display:flex;align-items:center;gap:10px;font-weight:600}
+.mark i{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+/* hero */
+.hero{padding-block:36px 28px}
+.hero h1{font-size:clamp(44px,10vw,72px);line-height:1;letter-spacing:-.045em;font-weight:600;display:flex}
+.hero h1 span{display:inline-block}
+.hero p{margin-top:12px;color:var(--soft);font-size:17px;max-width:40ch}
+
+/* brief */
+.brief{margin-top:8px;border-top:1px solid var(--line)}
+.brief li{list-style:none;display:flex;gap:14px;align-items:baseline;padding-block:14px;border-bottom:1px solid var(--line);font-size:17px;line-height:1.4}
+.brief ul{padding:0}
+.brief li::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--accent);transform:translateY(-3px)}
+.brief .h{display:flex;justify-content:space-between;align-items:baseline;margin:40px 0 4px}
+.brief .h h2,.tabs-h h2{font-size:24px;font-weight:600;letter-spacing:-.02em}
+
+/* tabs */
+.tabs-h{margin:48px 0 14px}
+.seg{position:relative;display:inline-grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:8px}
+.seg button{position:relative;z-index:1;padding:9px 20px;border-radius:999px;font-weight:500;font-size:15px;color:var(--soft);transition:color .3s var(--ease);white-space:nowrap;text-align:center}
+.seg button[aria-selected="true"]{color:var(--bg)}
+.seg button sup{font-family:var(--f-mono);font-size:10px;margin-left:4px;opacity:.7}
+.pill{position:absolute;top:4px;bottom:4px;left:4px;border-radius:999px;background:var(--accent);transition:transform .45s var(--ease),width .45s var(--ease)}
+
+/* rows */
+.panel{border-top:1px solid var(--line)}
+.panel[hidden]{display:none}
+.row{border-bottom:1px solid var(--line)}
+.row>button{width:100%;display:grid;grid-template-columns:minmax(0,1fr) 28px;gap:14px;align-items:start;padding-block:18px}
+.row .t{font-size:18px;font-weight:600;line-height:1.3;letter-spacing:-.01em}
+.row .s{display:block;margin-top:4px;color:var(--soft);font-size:15px;line-height:1.45}
+.row .m{display:block;margin-bottom:6px}
+.row .m b{color:var(--accent);font-weight:400}
+.plus{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);position:relative;margin-top:2px;transition:background .3s var(--ease),border-color .3s var(--ease),transform .45s var(--ease)}
+.plus::before,.plus::after{content:"";position:absolute;left:50%;top:50%;width:10px;height:1.5px;background:var(--ink);transform:translate(-50%,-50%)}
+.plus::after{transform:translate(-50%,-50%) rotate(90deg)}
+.row>button:hover .plus{border-color:var(--accent)}
+.row.open .plus{transform:rotate(45deg);background:var(--accent);border-color:var(--accent)}
+.row.open .plus::before,.row.open .plus::after{background:var(--bg)}
+.body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--ease)}
+.row.open .body{grid-template-rows:1fr}
+.body>div{overflow:hidden}
+.in{padding:0 42px 20px 0;display:grid;gap:12px;opacity:0;transform:translateY(-6px);transition:opacity .35s var(--ease),transform .35s var(--ease)}
+.row.open .in{opacity:1;transform:none;transition-delay:.08s}
+.in p{color:var(--soft);font-size:15px}
+.try{padding:12px 14px;border-radius:12px;background:var(--accent-soft);font-size:15px}
+.try span{display:block;font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
+.src{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+
+/* archive */
+.arch{margin-top:56px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:18px;border-top:1px solid var(--line)}
+
+@media (max-width:520px){
+  .seg{display:grid;width:100%}
+  .seg button{padding:9px 10px}
+  .in{padding-right:0}
+  .brief li{font-size:16px}
+}
+
+/* motion: only on load and interaction */
+@media (prefers-reduced-motion:no-preference){
+  .hero h1 span{animation:letter .7s var(--ease) both;animation-delay:calc(var(--i)*45ms)}
+  @keyframes letter{from{opacity:0;transform:translateY(.35em)}to{opacity:1;transform:none}}
+  .hero p,.brief li{animation:fade .6s var(--ease) both}
+  .hero p{animation-delay:.4s}
+  .brief li{animation-delay:calc(.5s + var(--i)*70ms)}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .glow{animation:drift 14s ease-in-out infinite alternate}
+  @keyframes drift{to{transform:translate(-60px,40px) scale(1.15)}}
+  .panel.enter .row{animation:fade .45s var(--ease) both;animation-delay:calc(var(--i)*45ms)}
+  .mark i{animation:pulse 2.8s ease-in-out infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 6px rgba(207,167,90,.15)}}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* issues archive */
+.issues{margin-top:56px}
+.issues h2{font-size:24px;font-weight:600;letter-spacing:-.02em;margin-bottom:12px}
+.iss{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:14px;align-items:baseline;padding-block:14px;border-top:1px solid var(--line);text-decoration:none;color:var(--soft);transition:color .2s}
+.iss:last-child{border-bottom:1px solid var(--line)}
+.iss:hover{color:var(--ink)}
+.iss .n{font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink)}
+.iss.cur .n{color:var(--accent)}
+@media (max-width:520px){.iss{grid-template-columns:32px minmax(0,1fr)}.iss .lbl{grid-column:2}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="glow" aria-hidden="true"></div>
+
+  <header class="top">
+    <div class="mark"><i aria-hidden="true"></i>Ротация</div>
+    <span class="lbl">Выпуск 02 · 03.11.2026</span>
+  </header>
+
+  <div class="hero">
+    <h1 aria-label="Ротация"><span style="--i:0">Р</span><span style="--i:1">о</span><span style="--i:2">т</span><span style="--i:3">а</span><span style="--i:4">ц</span><span style="--i:5">и</span><span style="--i:6">я</span></h1>
+    <p>Новые механики внутренних переходов и главные новости.</p>
+  </div>
+
+  <section class="brief" aria-labelledby="brief-h" style="border-top:0">
+    <div class="h"><h2 id="brief-h">Коротко</h2><span class="lbl">5 мыслей</span></div>
+    <ul>
+      <li style="--i:0">Профиль навыков теперь собирает ИИ из рабочих данных, а не сам сотрудник</li>
+      <li style="--i:1">В «Слетать.ру» будущую ротацию обсуждают ещё на собеседовании</li>
+      <li style="--i:2">ДОМ.РФ временно переводит людей в перегруженные отделы с сохранением зарплаты</li>
+      <li style="--i:3">Intuit оплачивает ротации из общего бюджета, а не из бюджета команды</li>
+      <li style="--i:4">BCG: за 2–3 года изменится половина работ, исчезнет только 10–15%</li>
+    </ul>
+  </section>
+
+  <section aria-label="Фишки и новости">
+    <div class="tabs-h">
+      <div class="seg" role="tablist" aria-label="Раздел">
+        <span class="pill" aria-hidden="true"></span>
+        <button role="tab" id="tab-tricks" aria-controls="p-tricks" aria-selected="true">Фишки<sup>6</sup></button>
+        <button role="tab" id="tab-news" aria-controls="p-news" aria-selected="false" tabindex="-1">Новости<sup>5</sup></button>
+      </div>
+    </div>
+
+    <div class="panel" id="p-tricks" role="tabpanel" aria-labelledby="tab-tricks">
+      <div class="row" style="--i:0"><button aria-expanded="false" id="t1"><span><span class="m lbl"><b>Oracle · Workday</b></span><span class="t">Профиль навыков собирается сам</span><span class="s">ИИ определяет навыки по задачам и проектам сотрудника</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>Агент Oracle обновляет профиль по данным из рабочих систем, без ручного заполнения. Workday в октябре открыл ранний доступ к инструменту, который раскладывает каждую роль на задачи и навыки по справочнику из 75 тысяч навыков.</p>
+          <div class="try"><span>Попробовать</span>Подтягивать в профиль кандидата на ротацию навыки из его задач и проектов, а не из анкеты.</div>
+          <div class="src"><a href="https://www.prnewswire.com/news-releases/oracle-adds-new-fusion-agentic-applications-and-ai-agents-to-help-organizations-improve-talent-management-302847997.html">Oracle, авг 2026</a> · <a href="https://www.silvercloudhr.co.uk/insights/movers-shakers-hr-tech-landscape-in-october-2026">Workday, окт 2026</a></div>
+        </div></div></div></div>
+
+      <div class="row" style="--i:1"><button aria-expanded="false" id="t2"><span><span class="m lbl"><b>Слетать.ру</b></span><span class="t">Ротация, запланированная при найме</span><span class="s">Переход в профильный отдел через 6–12 месяцев</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>Все новички начинают в контакт-центре, а на собеседовании с ними сразу обсуждают следующую роль. Из одной стартовой позиции есть несколько треков: в продажи или в бронирование. Так компания закрывает изнутри до двух третей вакансий.</p>
+          <div class="try"><span>Попробовать</span>Для массовых входных ролей заранее описать 2–3 трека перехода и называть их на найме.</div>
+          <div class="src"><a href="https://global38.ru/news/id/10067">global38.ru, июль 2026</a></div>
+        </div></div></div></div>
+
+      <div class="row" style="--i:2"><button aria-expanded="false" id="t3"><span><span class="m lbl"><b>ДОМ.РФ · Авито</b></span><span class="t">Временное подкрепление команды</span><span class="s">Сотрудник помогает перегруженному отделу и возвращается</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>В ДОМ.РФ людей переводят туда, где не хватает рук, с сохранением зарплаты и премий. Куда переводить, решают по ежемесячному анализу нагрузки. В Авито похожий формат: подкрепление соседнего юнита на полгода.</p>
+          <div class="try"><span>Попробовать</span>Предлагать временное подкрепление как пробный шаг перед полной ротацией.</div>
+          <div class="src"><a href="https://global38.ru/news/id/10067">global38.ru</a> · <a href="https://habr.com/ru/companies/avito/articles/898888/">Хабр, Авито</a></div>
+        </div></div></div></div>
+
+      <div class="row" style="--i:3"><button aria-expanded="false" id="t4"><span><span class="m lbl"><b>Intuit</b></span><span class="t">Ротации оплачивает центр</span><span class="s">Принимающая команда не тратит свой бюджет</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>Программа ротаций продакт-менеджеров работает больше 20 лет. Деньги на неё выделяются централизованно, поэтому командам проще брать людей на ротацию.</p>
+          <div class="try"><span>Попробовать</span>Отдельный бюджет на переходы, чтобы ставка не «висела» на принимающей команде в первые месяцы.</div>
+          <div class="src"><a href="https://global38.ru/news/id/10067">global38.ru</a></div>
+        </div></div></div></div>
+
+      <div class="row" style="--i:4"><button aria-expanded="false" id="t5"><span><span class="m lbl"><b>BCG · HR Tech 2026</b></span><span class="t">Карта ролей, которые изменит ИИ</span><span class="s">Заранее понять, кого и куда переводить</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>BCG оценивает, что за 2–3 года ИИ заметно изменит 50–55% работ, а заменить может 10–15%. Компания советует планировать переводы заранее. На HR Tech 2026 показали сервис, который находит роли, которые останутся ценными при росте ИИ.</p>
+          <div class="try"><span>Попробовать</span>Отметить роли с высоким риском автоматизации и заранее предлагать этим людям ротацию.</div>
+          <div class="src"><a href="https://www.bcg.com/publications/2026/ai-will-reshape-more-jobs-than-it-replaces">BCG</a> · <a href="https://www.globenewswire.com/news-release/2026/10/13/3379519/0/en/scores-of-new-products-get-ready-to-launch-at-hr-tech-2026.html">HR Tech, окт 2026</a></div>
+        </div></div></div></div>
+
+      <div class="row" style="--i:5"><button aria-expanded="false" id="t6"><span><span class="m lbl"><b>Авито</b></span><span class="t">Чек-лист сотрудника перед переходом</span><span class="s">Что проверить, чтобы ротация не стала шагом назад</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>Собрать обратную связь от руководителя и команды, посмотреть оценки за 2–3 последних ревью, изучить бэклог новой команды и заранее договориться с новым руководителем об ожиданиях.</p>
+          <div class="try"><span>Попробовать</span>Отправлять такой чек-лист каждому, кто подаёт заявку на ротацию.</div>
+          <div class="src"><a href="https://habr.com/ru/companies/avito/articles/898888/">Хабр, Авито</a></div>
+        </div></div></div></div>
+    </div>
+
+    <div class="panel" id="p-news" role="tabpanel" aria-labelledby="tab-news" hidden>
+      <div class="row" style="--i:0"><button aria-expanded="false" id="n1"><span><span class="m lbl"><b>Мир</b> · 27 окт</span><span class="t">Dayforce показала, вырастить навык или нанять</span><span class="s">Руководитель видит пробелы в навыках команды</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>В обновлённой системе оценки менеджер видит, какие навыки можно развить внутри команды, а где нужен новый человек. ИИ-агенты уже доступны, остальные функции выйдут в 2027 году.</p><div class="src"><a href="https://www.globenewswire.com/news-release/2026/10/27/3389571/0/en/dayforce-introduces-agentic-talent-experiences-to-transform-how-organizations-hire-and-develop-talent.html">GlobeNewswire</a></div></div></div></div></div>
+
+      <div class="row" style="--i:1"><button aria-expanded="false" id="n2"><span><span class="m lbl"><b>Мир</b> · 13 окт</span><span class="t">Workday раскладывает работу на задачи и навыки</span><span class="s">Видно, где ИИ поможет, а где нужен человек</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Инструмент Work Intelligence показывает, какие задачи можно автоматизировать и где ценны навыки людей. Пока он в раннем доступе для клиентов Workday.</p><div class="src"><a href="https://www.silvercloudhr.co.uk/insights/movers-shakers-hr-tech-landscape-in-october-2026">SilverCloud HR</a></div></div></div></div></div>
+
+      <div class="row" style="--i:2"><button aria-expanded="false" id="n3"><span><span class="m lbl"><b>Мир</b> · 7 окт</span><span class="t">Свои сотрудники дают компании преимущество</span><span class="s">Питер Каппелли призывает HR сокращать внешний найм</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Профессор Уортона пишет, что компании, которые продвигают людей изнутри, выигрывают у конкурентов, и HR стоит бороться за меньший найм со стороны.</p><div class="src"><a href="https://hrexecutive.com/internal-mobility-why-insiders-have-the-advantage/">HR Executive</a></div></div></div></div></div>
+
+      <div class="row" style="--i:3"><button aria-expanded="false" id="n4"><span><span class="m lbl"><b>Мир</b> · Октябрь</span><span class="t">На HR Tech 2026 почти нет внутренних бирж</span><span class="s">Новинки в основном про внешний найм</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Ближе всего к теме сервисы для планирования преемников и для поиска ролей, устойчивых к ИИ. Отдельных продуктов для внутренних переходов среди анонсов нет.</p><div class="src"><a href="https://www.globenewswire.com/news-release/2026/10/13/3379519/0/en/scores-of-new-products-get-ready-to-launch-at-hr-tech-2026.html">GlobeNewswire</a></div></div></div></div></div>
+
+      <div class="row" style="--i:4"><button aria-expanded="false" id="n5"><span><span class="m lbl"><b>Россия</b> · 2026</span><span class="t">Половина компаний назвала мобильность приоритетом</span><span class="s">52,7% компаний включили её в ключевые задачи года</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Растёт и внутреннее совместительство: около 10% компаний увеличили число сотрудников, которые совмещают две роли.</p><div class="src"><a href="https://new-retail.ru/business/spros_na_vnutrennee_sovmestitelstvo_v_2026/">New Retail</a></div></div></div></div></div>
+    </div>
+  </section>
+
+  <footer class="arch">
+    <span class="lbl">Выпуск 02 · 03.11.2026</span>
+    <a class="lbl" href="../">Все выпуски →</a>
+  </footer>
+</div>
+
+<script>
+(function(){
+  // accordion
+  document.querySelectorAll('.row>button').forEach(function(b){
+    b.addEventListener('click',function(){
+      var row=b.parentElement, open=!row.classList.contains('open');
+      row.classList.toggle('open',open); b.setAttribute('aria-expanded',String(open));
+    });
+  });
+  // tabs with sliding pill
+  var tabs=[].slice.call(document.querySelectorAll('[role=tab]')), pill=document.querySelector('.pill');
+  function place(t){pill.style.width=t.offsetWidth+'px';pill.style.transform='translateX('+(t.offsetLeft-4)+'px)';}
+  function select(t,focus){
+    tabs.forEach(function(x){
+      var on=x===t; x.setAttribute('aria-selected',String(on)); x.tabIndex=on?0:-1;
+      var p=document.getElementById(x.getAttribute('aria-controls')); p.hidden=!on;
+      if(on){p.classList.remove('enter');void p.offsetWidth;p.classList.add('enter');}
+    });
+    place(t); if(focus)t.focus();
+  }
+  tabs.forEach(function(t,i){
+    t.addEventListener('click',function(){select(t)});
+    t.addEventListener('keydown',function(e){
+      if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();select(tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length],true);}
+    });
+  });
+  function init(){place(tabs.filter(function(t){return t.getAttribute('aria-selected')==='true'})[0]);}
+  init(); window.addEventListener('resize',init);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(init);
+})();
+</script>
+
+</body>
+</html>
