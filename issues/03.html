@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ротация</title>
+<meta name="description" content="Дайджест внутренней мобильности: новые механики переходов между командами и главные новости.">
+<meta property="og:title" content="Ротация">
+<meta property="og:description" content="Новые механики внутренних переходов и главные новости.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0F0F0E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230F0F0E'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23CFA75A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: одна узкая колонка для чтения. Шапка → «Коротко» → вкладки «Фишки / Новости» → строки-аккордеоны. Детали скрыты, пока их не открыли. Single dark look by design. */
+:root{
+  --bg:#0F0F0E; --surface:#171715; --surface-2:#1E1E1C; --ink:#ECEAE4; --soft:#B4B1A9; --muted:#7F7C75; --line:#262522;
+  --accent:#CFA75A; --accent-soft:rgba(207,167,90,.12);
+  --f:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --ease:cubic-bezier(.2,.7,.1,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px;overflow-x:hidden}
+::selection{background:var(--accent);color:var(--bg)}
+a{color:inherit;text-decoration-color:var(--line);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.wrap{max-width:720px;margin:0 auto;position:relative}
+h1,h2,h3,p,ul{margin:0}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+/* ambient glow */
+.glow{position:fixed;top:-140px;right:-160px;width:420px;height:420px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(207,167,90,.16),transparent 65%);filter:blur(10px);z-index:0}
+.wrap>*:not(.glow){position:relative;z-index:1}
+
+/* top */
+.top{display:flex;justify-content:space-between;align-items:center;padding-block:20px}
+.mark{display:flex;align-items:center;gap:10px;font-weight:600}
+.mark i{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+/* hero */
+.hero{padding-block:36px 28px}
+.hero h1{font-size:clamp(44px,10vw,72px);line-height:1;letter-spacing:-.045em;font-weight:600;display:flex}
+.hero h1 span{display:inline-block}
+.hero p{margin-top:12px;color:var(--soft);font-size:17px;max-width:40ch}
+
+/* brief */
+.brief{margin-top:8px;border-top:1px solid var(--line)}
+.brief li{list-style:none;display:flex;gap:14px;align-items:baseline;padding-block:14px;border-bottom:1px solid var(--line);font-size:17px;line-height:1.4}
+.brief ul{padding:0}
+.brief li::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--accent);transform:translateY(-3px)}
+.brief .h{display:flex;justify-content:space-between;align-items:baseline;margin:40px 0 4px}
+.brief .h h2,.tabs-h h2{font-size:24px;font-weight:600;letter-spacing:-.02em}
+
+/* tabs */
+.tabs-h{margin:48px 0 14px}
+.seg{position:relative;display:inline-grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:8px}
+.seg button{position:relative;z-index:1;padding:9px 20px;border-radius:999px;font-weight:500;font-size:15px;color:var(--soft);transition:color .3s var(--ease);white-space:nowrap;text-align:center}
+.seg button[aria-selected="true"]{color:var(--bg)}
+.seg button sup{font-family:var(--f-mono);font-size:10px;margin-left:4px;opacity:.7}
+.pill{position:absolute;top:4px;bottom:4px;left:4px;border-radius:999px;background:var(--accent);transition:transform .45s var(--ease),width .45s var(--ease)}
+
+/* rows */
+.panel{border-top:1px solid var(--line)}
+.panel[hidden]{display:none}
+.row{border-bottom:1px solid var(--line)}
+.row>button{width:100%;display:grid;grid-template-columns:minmax(0,1fr) 28px;gap:14px;align-items:start;padding-block:18px}
+.row .t{font-size:18px;font-weight:600;line-height:1.3;letter-spacing:-.01em}
+.row .s{display:block;margin-top:4px;color:var(--soft);font-size:15px;line-height:1.45}
+.row .m{display:block;margin-bottom:6px}
+.row .m b{color:var(--accent);font-weight:400}
+.plus{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);position:relative;margin-top:2px;transition:background .3s var(--ease),border-color .3s var(--ease),transform .45s var(--ease)}
+.plus::before,.plus::after{content:"";position:absolute;left:50%;top:50%;width:10px;height:1.5px;background:var(--ink);transform:translate(-50%,-50%)}
+.plus::after{transform:translate(-50%,-50%) rotate(90deg)}
+.row>button:hover .plus{border-color:var(--accent)}
+.row.open .plus{transform:rotate(45deg);background:var(--accent);border-color:var(--accent)}
+.row.open .plus::before,.row.open .plus::after{background:var(--bg)}
+.body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--ease)}
+.row.open .body{grid-template-rows:1fr}
+.body>div{overflow:hidden}
+.in{padding:0 42px 20px 0;display:grid;gap:12px;opacity:0;transform:translateY(-6px);transition:opacity .35s var(--ease),transform .35s var(--ease)}
+.row.open .in{opacity:1;transform:none;transition-delay:.08s}
+.in p{color:var(--soft);font-size:15px}
+.try{padding:12px 14px;border-radius:12px;background:var(--accent-soft);font-size:15px}
+.try span{display:block;font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
+.src{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+
+/* archive */
+.arch{margin-top:56px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:18px;border-top:1px solid var(--line)}
+
+@media (max-width:520px){
+  .seg{display:grid;width:100%}
+  .seg button{padding:9px 10px}
+  .in{padding-right:0}
+  .brief li{font-size:16px}
+}
+
+/* motion: only on load and interaction */
+@media (prefers-reduced-motion:no-preference){
+  .hero h1 span{animation:letter .7s var(--ease) both;animation-delay:calc(var(--i)*45ms)}
+  @keyframes letter{from{opacity:0;transform:translateY(.35em)}to{opacity:1;transform:none}}
+  .hero p,.brief li{animation:fade .6s var(--ease) both}
+  .hero p{animation-delay:.4s}
+  .brief li{animation-delay:calc(.5s + var(--i)*70ms)}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .glow{animation:drift 14s ease-in-out infinite alternate}
+  @keyframes drift{to{transform:translate(-60px,40px) scale(1.15)}}
+  .panel.enter .row{animation:fade .45s var(--ease) both;animation-delay:calc(var(--i)*45ms)}
+  .mark i{animation:pulse 2.8s ease-in-out infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 6px rgba(207,167,90,.15)}}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* issues archive */
+.issues{margin-top:56px}
+.issues h2{font-size:24px;font-weight:600;letter-spacing:-.02em;margin-bottom:12px}
+.iss{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:14px;align-items:baseline;padding-block:14px;border-top:1px solid var(--line);text-decoration:none;color:var(--soft);transition:color .2s}
+.iss:last-child{border-bottom:1px solid var(--line)}
+.iss:hover{color:var(--ink)}
+.iss .n{font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink)}
+.iss.cur .n{color:var(--accent)}
+@media (max-width:520px){.iss{grid-template-columns:32px minmax(0,1fr)}.iss .lbl{grid-column:2}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="glow" aria-hidden="true"></div>
+
+  <header class="top">
+    <div class="mark"><i aria-hidden="true"></i>Ротация</div>
+    <span class="lbl">Выпуск 03 · 06.11.2026</span>
+  </header>
+
+  <div class="hero">
+    <h1 aria-label="Ротация"><span style="--i:0">Р</span><span style="--i:1">о</span><span style="--i:2">т</span><span style="--i:3">а</span><span style="--i:4">ц</span><span style="--i:5">и</span><span style="--i:6">я</span></h1>
+    <p>Новые механики внутренних переходов и главные новости.</p>
+  </div>
+
+  <section class="brief" aria-labelledby="brief-h" style="border-top:0">
+    <div class="h"><h2 id="brief-h">Коротко</h2><span class="lbl">5 мыслей</span></div>
+    <ul>
+      <li style="--i:0">Встречное предложение удерживает всё чаще, но новую роль в нём дают редко.</li>
+      <li style="--i:1">Когда руководитель меняется, его люди подают почти на 80% больше заявок.</li>
+      <li style="--i:2">SAP объясняет руководителю, почему ИИ предложил именно этого кандидата.</li>
+      <li style="--i:3">Microsoft за год перевела на новые роли больше 4000 сотрудников.</li>
+      <li style="--i:4">42% руководителей оставили сотрудника, которого хотели уволить: некем заменить.</li>
+    </ul>
+  </section>
+
+  <section aria-label="Фишки и новости">
+    <div class="tabs-h">
+      <div class="seg" role="tablist" aria-label="Раздел">
+        <span class="pill" aria-hidden="true"></span>
+        <button role="tab" id="tab-tricks" aria-controls="p-tricks" aria-selected="true">Фишки<sup>4</sup></button>
+        <button role="tab" id="tab-news" aria-controls="p-news" aria-selected="false" tabindex="-1">Новости<sup>5</sup></button>
+      </div>
+    </div>
+
+    <div class="panel" id="p-tricks" role="tabpanel" aria-labelledby="tab-tricks">
+      <div class="row" style="--i:0"><button aria-expanded="false" id="t1"><span><span class="m lbl"><b>MWS</b></span><span class="t">Новая роль как встречное предложение</span><span class="s">Удерживать переходом, а не только прибавкой</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>По данным MWS, за год доля кандидатов, которые отказались от оффера из-за встречного предложения, выросла с 14% до 42%. При этом новую роль или проект прежний работодатель предлагал только в 15% случаев, а в 70% — деньги.</p>
+          <div class="try"><span>Попробовать</span>Когда сильный сотрудник собирается уйти, вместе с руководителем сразу показать ему 2–3 подходящие внутренние роли.</div>
+          <div class="src"><a href="https://cnews.ru/news/line/2026-11-05_issledovanie_mws_za_god_kompanii">CNews, 5 ноя 2026</a></div>
+        </div></div></div></div>
+
+      <div class="row" style="--i:1"><button aria-expanded="false" id="t2"><span><span class="m lbl"><b>Исследование AER · SHL</b></span><span class="t">Заявка, которую не видит руководитель</span><span class="s">Люди боятся не перехода, а реакции начальника</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>В крупном европейском производителе 75% руководителей признали, что иногда придерживают людей. Когда руководитель вот-вот сменится, его сотрудники подают на внутренние вакансии почти на 80% больше заявок. 68% руководителей держали бы людей меньше, если бы замену было проще найти.</p>
+          <p>В опросе SHL 31% сотрудников назвали нежелание руководителей отпускать сильных людей серьёзным препятствием для перехода.</p>
+          <div class="try"><span>Попробовать</span>Показывать заявку текущему руководителю только на финальном этапе и в тот же день запускать поиск замены в его команду.</div>
+          <div class="src"><a href="https://www.aeaweb.org/research/talent-hoarding-organizations-germany">AEA, авг 2026</a> · <a href="https://hrtechedge.com/hr/shl-report-finds-hidden-skills-are-undermining-internal-mobility/">SHL, окт 2026</a></div>
+        </div></div></div></div>
+
+      <div class="row" style="--i:2"><button aria-expanded="false" id="t3"><span><span class="m lbl"><b>SAP SuccessFactors</b></span><span class="t">Подбор кандидатов с объяснением</span><span class="s">ИИ показывает, почему предложил этого человека</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>В осеннем релизе руководитель ищет внутренних кандидатов, преемников и экспертов через ассистента Joule. Для каждого результата система объясняет, что повлияло на выбор.</p>
+          <div class="try"><span>Попробовать</span>В карточке кандидата на ротацию писать, какие навыки и проекты дали совпадение, чтобы руководителю было проще согласиться.</div>
+          <div class="src"><a href="https://news.sap.com/2026/10/sap-successfactors-2h-2026-release/">SAP News, 12 окт 2026</a></div>
+        </div></div></div></div>
+
+      <div class="row" style="--i:3"><button aria-expanded="false" id="t4"><span><span class="m lbl"><b>Microsoft</b></span><span class="t">Сначала перевод, потом выход</span><span class="s">4000 переводов за год и добровольный уход</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in">
+          <p>Microsoft за прошлый год перевела на новые роли больше 4000 сотрудников. 26 октября компания предложила добровольный уход с выплатами примерно 60 тысячам человек и ожидает, что согласятся не больше 5%. Остальным обещает помогать с новыми ролями внутри компании там, где это уместно.</p>
+          <div class="try"><span>Попробовать</span>Перед сокращением команды дать её людям приоритетный доступ к внутренним вакансиям и считать, какую долю удалось перевести.</div>
+          <div class="src"><a href="https://blogs.microsoft.com/blog/2026/10/26/introducing-a-voluntary-exit-offer/">Microsoft, 26 окт 2026</a> · <a href="https://www.forbes.com/sites/sheilacallaham/2026/10/29/is-microsoft-creating-a-workforce-transition-model-other-employers-should-follow/">Forbes, 29 окт 2026</a></div>
+        </div></div></div></div>
+    </div>
+
+    <div class="panel" id="p-news" role="tabpanel" aria-labelledby="tab-news" hidden>
+      <div class="row" style="--i:0"><button aria-expanded="false" id="n1"><span><span class="m lbl"><b>Мир</b> · 5 ноя</span><span class="t">Треть компаний вернула роли, отданные ИИ</span><span class="s">32% из 2000 менеджеров по найму в США восстановили должности</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Главные причины: ИИ не хватает знаний о компании (40%), за ним нужно больше проверок (38%), а рост производительности оказался ниже ожиданий (35%). Опрос провела Robert Half.</p><div class="src"><a href="https://www.peoplematters.in/news/ai-and-emerging-tech/ai-layoffs-backfire-32percent-of-companies-bring-back-jobs-cut-through-automation-53198">People Matters</a></div></div></div></div></div>
+
+      <div class="row" style="--i:1"><button aria-expanded="false" id="n2"><span><span class="m lbl"><b>Мир</b> · 4 ноя</span><span class="t">В Индии 83% топ-позиций заняли люди извне</span><span class="s">Своих чаще повышают в центрах иностранных компаний</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>CIEL HR изучила около 80 тысяч позиций высшего уровня: 82,6% из них заняли внешние кандидаты. В глобальных сервисных центрах иностранных компаний руководителей повышают изнутри в 43% случаев, в индийских компаниях — в 22%.</p><div class="src"><a href="https://www.business-standard.com/industry/news/india-inc-prefers-external-hires-for-c-suite-roles-women-lag-ciel-report-126110401566_1.html">Business Standard</a></div></div></div></div></div>
+
+      <div class="row" style="--i:2"><button aria-expanded="false" id="n3"><span><span class="m lbl"><b>Мир</b> · 3 ноя</span><span class="t">Canva меняет работу 22% сотрудников</span><span class="s">1271 человек: увольнение, переезд или новая роль</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Затронутые сотрудники либо уйдут, либо переедут, либо сменят роль. Генеральный директор Мелани Перкинс объяснила это тем, что рост компании впервые за 13 лет замедлился.</p><div class="src"><a href="https://www.adweek.com/creativity/canva-to-cut-or-redeploy-22-of-staff-following-hardest-year-yet/">Adweek</a></div></div></div></div></div>
+
+      <div class="row" style="--i:3"><button aria-expanded="false" id="n4"><span><span class="m lbl"><b>Мир</b> · 1 ноя</span><span class="t">Pick n Pay обошлась без сокращений</span><span class="s">Сеть договорилась с профсоюзом и сменила модель работы</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Консультации о сокращении касались около 22 тысяч работников магазинов в ЮАР. С 1 ноября магазины работают по новой модели без единого увольнения, а работники, по данным профсоюза, отказались от части доплаты за воскресенья.</p><div class="src"><a href="https://www.businessday.co.za/opinion/2026-11-05-jonathan-goldberg-redeploy-before-you-retrench/">Business Day</a> · <a href="https://www.ewn.co.za/pick-n-pay-drops-proposed-22-000-job-cuts-after-reaching-deal-with-saccawu/">EWN</a></div></div></div></div></div>
+
+      <div class="row" style="--i:4"><button aria-expanded="false" id="n5"><span><span class="m lbl"><b>Россия</b> · 2 ноя</span><span class="t">42% руководителей держат тех, с кем хотели расстаться</span><span class="s">Причина — сотрудника некем заменить</span></span><span class="plus" aria-hidden="true"></span></button>
+        <div class="body"><div><div class="in"><p>Русская школа управления опросила 726 представителей компаний. 75% сталкивались с тем, что уход ключевого сотрудника мог навредить компании, а 27% признали, что позволяют ключевым людям больше, чем остальным.</p><div class="src"><a href="https://www.novostiitkanala.ru/news/detail.php?ID=199758">Новости IT-канала</a></div></div></div></div></div>
+    </div>
+  </section>
+
+  <footer class="arch">
+    <span class="lbl">Выпуск 03 · 06.11.2026</span>
+    <a class="lbl" href="../">Все выпуски →</a>
+  </footer>
+</div>
+
+<script>
+(function(){
+  // accordion
+  document.querySelectorAll('.row>button').forEach(function(b){
+    b.addEventListener('click',function(){
+      var row=b.parentElement, open=!row.classList.contains('open');
+      row.classList.toggle('open',open); b.setAttribute('aria-expanded',String(open));
+    });
+  });
+  // tabs with sliding pill
+  var tabs=[].slice.call(document.querySelectorAll('[role=tab]')), pill=document.querySelector('.pill');
+  function place(t){pill.style.width=t.offsetWidth+'px';pill.style.transform='translateX('+(t.offsetLeft-4)+'px)';}
+  function select(t,focus){
+    tabs.forEach(function(x){
+      var on=x===t; x.setAttribute('aria-selected',String(on)); x.tabIndex=on?0:-1;
+      var p=document.getElementById(x.getAttribute('aria-controls')); p.hidden=!on;
+      if(on){p.classList.remove('enter');void p.offsetWidth;p.classList.add('enter');}
+    });
+    place(t); if(focus)t.focus();
+  }
+  tabs.forEach(function(t,i){
+    t.addEventListener('click',function(){select(t)});
+    t.addEventListener('keydown',function(e){
+      if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();select(tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length],true);}
+    });
+  });
+  function init(){place(tabs.filter(function(t){return t.getAttribute('aria-selected')==='true'})[0]);}
+  init(); window.addEventListener('resize',init);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(init);
+})();
+</script>
+
+</body>
+</html>
